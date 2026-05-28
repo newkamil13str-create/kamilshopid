@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -32,7 +32,7 @@ type EmailForm = z.infer<typeof emailSchema>;
 type PhoneForm = z.infer<typeof phoneSchema>;
 type Tab = 'google' | 'email' | 'phone';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
@@ -108,7 +108,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen animated-gradient flex items-center justify-center p-4">
-      {/* Glow blobs */}
       <div className="fixed top-1/4 left-1/4 w-80 h-80 bg-electric-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed bottom-1/4 right-1/4 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -118,7 +117,6 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-2">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-electric-600 to-gold-500 flex items-center justify-center text-white font-display font-bold text-2xl shadow-glow-blue">
@@ -132,7 +130,6 @@ export default function LoginPage() {
         </div>
 
         <div className="glass rounded-3xl p-7 border border-white/5">
-          {/* Tabs */}
           <div className="flex gap-1 bg-navy-100 rounded-xl p-1 mb-6">
             {(['google', 'email', 'phone'] as Tab[]).map((t) => (
               <button
@@ -149,7 +146,6 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {/* Google */}
           {tab === 'google' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <p className="text-white/50 text-sm text-center mb-6 leading-relaxed">
@@ -175,7 +171,6 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          {/* Email */}
           {tab === 'email' && (
             <motion.form
               initial={{ opacity: 0 }}
@@ -241,7 +236,6 @@ export default function LoginPage() {
             </motion.form>
           )}
 
-          {/* Phone */}
           {tab === 'phone' && (
             <motion.form
               initial={{ opacity: 0 }}
@@ -308,7 +302,6 @@ export default function LoginPage() {
             </motion.form>
           )}
 
-          {/* Register link */}
           <p className="text-white/40 text-sm text-center mt-6">
             Belum punya akun?{' '}
             <Link href="/auth/register" className="text-electric-400 hover:text-electric-300 font-medium">
@@ -318,5 +311,17 @@ export default function LoginPage() {
         </div>
       </motion.div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen animated-gradient flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-electric-600/30 border-t-electric-600 rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
