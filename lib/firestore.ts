@@ -187,12 +187,19 @@ export async function getRevenueByDays(days: number): Promise<{ date: string; re
   );
   const map = new Map<string, number>();
   snap.docs.forEach((d) => {
-    const order = d.data() as Order;
-    const date = order.createdAt?.toDate
-      ? order.createdAt.toDate().toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
-      : 'N/A';
-    map.set(date, (map.get(date) || 0) + (order.totalPayment || order.amount));
-  });
+  const order = d.data() as Order;
+  const raw = order.createdAt;
+  let dateObj: Date;
+  if (raw && typeof (raw as Timestamp).toDate === 'function') {
+    dateObj = (raw as Timestamp).toDate();
+  } else if (raw instanceof Date) {
+    dateObj = raw;
+  } else {
+    return;
+  }
+  const date = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+  map.set(date, (map.get(date) || 0) + (order.totalPayment || order.amount));
+});
   return Array.from(map.entries()).map(([date, revenue]) => ({ date, revenue }));
 }
 
